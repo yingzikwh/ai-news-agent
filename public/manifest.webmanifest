@@ -1,0 +1,17 @@
+{
+  "name": "AI News Agent",
+  "short_name": "AINews",
+  "description": "基于 CodeBuddy Agent SDK 的全自动 AI 资讯抓取客户端",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#3366ff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
