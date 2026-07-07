@@ -47,7 +47,7 @@ function buildPrompt(sources: Source[]): string {
     "tags": ["关键词1", "关键词2"]
   }
 ]
-最多返回 30 条，按时间倒序。`;
+信息源较多，请尽量覆盖不同来源的亮点内容，最多返回 50 条，按时间倒序。`;
 }
 
 function parseNewsJson(text: string): RawNewsItem[] {
@@ -92,7 +92,7 @@ export async function runNewsAgent(opts: AgentRunOptions): Promise<RawNewsItem[]
     options: {
       cwd: process.cwd(),
       model: opts.model,
-      maxTurns: opts.maxTurns ?? 10,
+      maxTurns: opts.maxTurns ?? 20,
       systemPrompt: opts.systemPrompt?.trim() || DEFAULT_SYSTEM_PROMPT,
       permissionMode: 'bypassPermissions',
     },
