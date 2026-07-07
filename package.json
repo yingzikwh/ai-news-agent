@@ -57,6 +57,7 @@
       "dist/**/*",
       "dist-server/**/*",
       "electron/**/*",
+      "node_modules/**/*",
       "package.json"
     ],
     "extraMetadata": {
