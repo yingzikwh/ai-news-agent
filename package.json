@@ -49,6 +49,7 @@
   "build": {
     "appId": "com.ainewsagent.app",
     "productName": "AI News Agent",
+    "asar": false,
     "directories": {
       "output": "release"
     },
