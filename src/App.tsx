@@ -40,6 +40,8 @@ export default function App() {
         onSearch={setSearchInput}
         onFetchNow={news.fetchNow}
         fetching={news.fetching}
+        translatingAll={news.translatingAll}
+        onTranslateAll={news.translateAll}
         statusText={news.statusText}
         onOpenSettings={() => setSettingsOpen(true)}
         theme={theme}
@@ -65,6 +67,7 @@ export default function App() {
             onLoadMore={news.loadMore}
             onToggleFavorite={news.toggleFavorite}
             onMarkRead={news.markRead}
+            onTranslate={news.translateItem}
           />
         </main>
       </div>

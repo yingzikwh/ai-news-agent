@@ -42,6 +42,13 @@ export const api = {
   ),
   markAllRead: () => req<{ success: boolean; count: number }>(`/api/news/read-all`, { method: 'POST' }),
 
+  translateItem: (id: string) =>
+    req<{ success: boolean; item: NewsItem }>(`/api/news/${id}/translate`, { method: 'POST' }),
+  translateAll: () =>
+    req<{ success: boolean; total: number; done: number; failed: number }>(
+      `/api/news/translate-all`, { method: 'POST' }
+    ),
+
   getCategories: () => req<{ categories: { key: Category; label: string }[] }>(`/api/categories`),
   getStats: () => req<Stats>(`/api/stats`),
 

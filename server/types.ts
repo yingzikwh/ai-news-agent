@@ -23,6 +23,9 @@ export interface NewsItem extends RawNewsItem {
   fetchedAt: string; // ISO8601
   isRead: boolean;
   isFavorite: boolean;
+  translatedTitle?: string; // 中文翻译（标题）
+  translatedSummary?: string; // 中文翻译（摘要）
+  translatedAt?: string; // 翻译时间 ISO8601
 }
 
 export type SourceType = 'rss' | 'web';

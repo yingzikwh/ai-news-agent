@@ -29,6 +29,7 @@ export function useNews() {
   const [fetching, setFetching] = useState(false);
   const [toasts, setToasts] = useState<ToastMsg[]>([]);
   const [statusText, setStatusText] = useState<string>('');
+  const [translatingAll, setTranslatingAll] = useState(false);
   const esRef = useRef<EventSource | null>(null);
 
   const pushToast = useCallback((text: string, detail?: string) => {
@@ -151,6 +152,33 @@ export function useNews() {
     try { await api.markAllRead(); await load(1, { silent: true }); } catch { /* ignore */ }
   }, [load]);
 
+  const translateItem = useCallback(async (id: string): Promise<boolean> => {
+    try {
+      const r = await api.translateItem(id);
+      setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...r.item } : i)));
+      return true;
+    } catch (e) {
+      pushToast('翻译失败', (e as Error).message);
+      return false;
+    }
+  }, [pushToast]);
+
+  const translateAll = useCallback(async () => {
+    setTranslatingAll(true);
+    try {
+      const r = await api.translateAll();
+      pushToast(
+        '翻译完成',
+        `共 ${r.total} 条，成功 ${r.done}${r.failed ? `，失败 ${r.failed}` : ''}`
+      );
+      await load(1, { silent: true });
+    } catch (e) {
+      pushToast('翻译失败', (e as Error).message);
+    } finally {
+      setTranslatingAll(false);
+    }
+  }, [load, pushToast]);
+
   const fetchNow = useCallback(async () => {
     setFetching(true);
     setStatusText('正在抓取…');
@@ -171,7 +199,8 @@ export function useNews() {
 
   return {
     items, stats, filters, setFilters, page, hasMore, total, loading, offline,
-    fetching, toasts, statusText, setStatusText,
-    load, loadMore, refresh, markRead, toggleFavorite, markAllRead, fetchNow, dismissToast,
+    fetching, translatingAll, toasts, statusText, setStatusText,
+    load, loadMore, refresh, markRead, toggleFavorite, markAllRead, fetchNow,
+    translateItem, translateAll, dismissToast,
   };
 }

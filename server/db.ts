@@ -15,13 +15,20 @@ import {
   VALID_CATEGORIES,
 } from './types.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// 兼容两种运行环境：开发(tsx/ESM)走 import.meta.url；生产(esbuild 打包为 CJS)由 esbuild/tsx 注入 __dirname
+declare const __dirname: string;
+const APP_DIR = (() => {
+  try {
+    return path.dirname(fileURLToPath(import.meta.url));
+  } catch {
+    return __dirname;
+  }
+})();
 
 // 数据目录：Electron 打包后使用用户数据目录（asar 只读），开发时使用项目 data/
 const dataDir = process.env.DATA_DIR
   ? path.join(process.env.DATA_DIR, 'ai-news-agent')
-  : path.join(__dirname, '..', 'data');
+  : path.join(APP_DIR, '..', 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const dbPath = path.join(dataDir, 'db.json');
 
@@ -186,6 +193,21 @@ export function toggleFavorite(id: string): NewsItem | undefined {
   return item;
 }
 
+/** 写入中文翻译结果 */
+export function setTranslation(
+  id: string,
+  translatedTitle: string,
+  translatedSummary: string
+): NewsItem | undefined {
+  const item = getItem(id);
+  if (!item) return undefined;
+  item.translatedTitle = translatedTitle;
+  item.translatedSummary = translatedSummary || '';
+  item.translatedAt = new Date().toISOString();
+  persist();
+  return item;
+}
+
 export function getNewItems(count: number): NewsItem[] {
   return state.items.slice(0, count);
 }
@@ -251,6 +273,7 @@ export default {
   markRead,
   markAllRead,
   toggleFavorite,
+  setTranslation,
   getNewItems,
   getStats,
   getSources,

@@ -1,4 +1,4 @@
-import { Bell, RefreshCw, Search, Settings, Sun, Moon, WifiOff } from 'lucide-react';
+import { Bell, Languages, RefreshCw, Search, Settings, Sun, Moon, WifiOff } from 'lucide-react';
 import { Stats } from '../types';
 
 interface Props {
@@ -6,6 +6,8 @@ interface Props {
   onSearch: (v: string) => void;
   onFetchNow: () => void;
   fetching: boolean;
+  translatingAll: boolean;
+  onTranslateAll: () => void;
   statusText: string;
   onOpenSettings: () => void;
   theme: 'light' | 'dark';
@@ -15,7 +17,8 @@ interface Props {
 }
 
 export default function Header({
-  search, onSearch, onFetchNow, fetching, statusText, onOpenSettings,
+  search, onSearch, onFetchNow, fetching, translatingAll, onTranslateAll,
+  statusText, onOpenSettings,
   theme, onToggleTheme, stats, offline,
 }: Props) {
   return (
@@ -58,6 +61,16 @@ export default function Header({
         >
           <RefreshCw className={`h-4 w-4 ${fetching ? 'animate-spin' : ''}`} />
           立即抓取
+        </button>
+
+        <button
+          onClick={onTranslateAll}
+          disabled={translatingAll}
+          title="将全部未翻译资讯译为中文"
+          className="hidden items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-sm font-medium text-indigo-600 shadow-sm transition hover:bg-indigo-100 disabled:opacity-60 sm:flex dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300"
+        >
+          <Languages className={`h-4 w-4 ${translatingAll ? 'animate-spin' : ''}`} />
+          翻译全部
         </button>
 
         <button

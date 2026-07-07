@@ -10,7 +10,7 @@
     "dev:server": "tsx server/index.ts",
     "dev:client": "vite",
     "server": "tsx server/index.ts",
-    "build:server": "esbuild server/index.ts --bundle --platform=node --packages=external --format=esm --outfile=dist-server/index.mjs --log-level=warning",
+    "build:server": "esbuild server/index.ts --bundle --platform=node --packages=external --format=cjs --outfile=dist-server/index.cjs --log-level=warning",
     "build": "vite build",
     "typecheck": "tsc -b",
     "preview": "vite preview",
@@ -49,7 +49,10 @@
   "build": {
     "appId": "com.ainewsagent.app",
     "productName": "AI News Agent",
-    "asar": false,
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/@tencent-ai/**"
+    ],
     "directories": {
       "output": "release"
     },
@@ -58,6 +61,8 @@
       "dist-server/**/*",
       "electron/**/*",
       "node_modules/**/*",
+      "!node_modules/electron",
+      "!node_modules/electron/**/*",
       "package.json"
     ],
     "extraMetadata": {

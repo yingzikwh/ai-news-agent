@@ -18,6 +18,9 @@ export interface NewsItem {
   tags: string[];
   isRead: boolean;
   isFavorite: boolean;
+  translatedTitle?: string;
+  translatedSummary?: string;
+  translatedAt?: string;
 }
 
 export type SourceType = 'rss' | 'web';

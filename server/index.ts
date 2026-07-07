@@ -7,10 +7,18 @@ import { fileURLToPath } from 'url';
 import * as db from './db.js';
 import { bus } from './events.js';
 import { startScheduler, setRunning, triggerNow, isBusy } from './scheduler.js';
+import { translateItemText } from './translate.js';
 import { CATEGORY_LABELS, Category, VALID_CATEGORIES } from './types.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// 兼容两种运行环境：开发(tsx/ESM)走 import.meta.url；生产(esbuild 打包为 CJS)由 esbuild/tsx 注入 __dirname
+declare const __dirname: string;
+const APP_DIR = (() => {
+  try {
+    return path.dirname(fileURLToPath(import.meta.url));
+  } catch {
+    return __dirname;
+  }
+})();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -62,6 +70,54 @@ app.post('/api/news/:id/favorite', (req, res) => {
 app.post('/api/news/read-all', (_req, res) => {
   const n = db.markAllRead();
   res.json({ success: true, count: n });
+});
+
+// ============= 翻译（中文） =============
+function requireApiKey(res: express.Response): boolean {
+  if (!process.env.CODEBUDDY_API_KEY) {
+    res.status(400).json({ error: '未配置 API Key，请先在「设置」中配置后再翻译' });
+    return false;
+  }
+  return true;
+}
+
+app.post('/api/news/:id/translate', async (req, res) => {
+  const item = db.getItem(req.params.id);
+  if (!item) return res.status(404).json({ error: '不存在' });
+  if (!requireApiKey(res)) return;
+  try {
+    const translated = await translateItemText(item.title, item.summary, db.getConfig().model);
+    const updated = db.setTranslation(req.params.id, translated.title, translated.summary);
+    res.json({ success: true, item: updated });
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || '翻译失败' });
+  }
+});
+
+app.post('/api/news/translate-all', async (_req, res) => {
+  if (!requireApiKey(res)) return;
+  const model = db.getConfig().model;
+  // getItems 单次最多返回 200 条，足以覆盖绝大多数本地存储
+  const targets = db.getItems({ limit: 100000 }).items.filter((i) => !i.translatedAt);
+  const total = targets.length;
+  let done = 0;
+  let failed = 0;
+  const CONCURRENCY = 3;
+  const queue = [...targets];
+  async function worker() {
+    while (queue.length) {
+      const item = queue.shift()!;
+      try {
+        const t = await translateItemText(item.title, item.summary, model);
+        db.setTranslation(item.id, t.title, t.summary);
+        done++;
+      } catch {
+        failed++;
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, total) }, () => worker()));
+  res.json({ success: true, total, done, failed });
 });
 
 // ============= 分类 =============
@@ -175,7 +231,7 @@ app.get('/api/stream', (req, res) => {
 });
 
 // ============= 托管前端静态资源 =============
-const distDir = path.join(__dirname, '..', 'dist');
+const distDir = path.join(APP_DIR, '..', 'dist');
 if (fs.existsSync(distDir)) {
   app.use(express.static(distDir));
   app.get(/^(?!\/api).*/, (_req, res) => {

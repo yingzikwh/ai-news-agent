@@ -11,10 +11,11 @@ interface Props {
   onLoadMore: () => void;
   onToggleFavorite: (id: string) => void;
   onMarkRead: (id: string, read: boolean) => void;
+  onTranslate: (id: string) => Promise<boolean>;
 }
 
 export default function NewsFeed({
-  items, loading, hasMore, total, offline, onLoadMore, onToggleFavorite, onMarkRead,
+  items, loading, hasMore, total, offline, onLoadMore, onToggleFavorite, onMarkRead, onTranslate,
 }: Props) {
   if (items.length === 0 && !loading) {
     return (
@@ -47,6 +48,7 @@ export default function NewsFeed({
             item={item}
             onToggleFavorite={onToggleFavorite}
             onMarkRead={onMarkRead}
+            onTranslate={onTranslate}
           />
         ))}
       </div>
