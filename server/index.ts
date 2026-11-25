@@ -57,7 +57,7 @@ app.get('/api/news/:id', (req, res) => {
 });
 
 app.post('/api/news/:id/read', (req, res) => {
-  const ok = db.markRead(req.params.id, req.body.read !== false);
+  const ok = db.markRead(req.params.id, req.body?.read !== false);
   res.json({ success: ok });
 });
 

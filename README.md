@@ -47,8 +47,8 @@
 └─────────────────────────────────────────────┘
 ```
 
-**技术栈**：React 18 · TypeScript · Tailwind CSS · Express 4 · CodeBuddy Agent SDK (`@tencent-ai/agent-sdk`) ·
-fast-xml-parser（RSS 解析）· SSE · Electron + electron-builder。
+**技术栈**：React 19 · TypeScript 5 · Tailwind CSS 4 · Express 5 · Vite 7 · CodeBuddy Agent SDK (`@tencent-ai/agent-sdk`) ·
+fast-xml-parser（RSS 解析）· SSE · Electron 45 + electron-builder 26。
 
 > 说明：数据存储采用纯 JSON 文件（`data/db.json`），不依赖 `better-sqlite3` 等原生模块，从而避免了
 > 原生编译与 Electron 打包（`electron-rebuild`）的烦恼，做到 Web / Electron 一致运行。
